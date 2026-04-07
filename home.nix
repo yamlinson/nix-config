@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   home.username = "main";
@@ -7,22 +7,22 @@
 
   # Packages for interactive use
   home.packages = with pkgs; [
-    # Editor
-    neovim
 
     # Shell tools
-    zsh
-    zsh-autocomplete
-    zsh-syntax-highlighting
-    zsh-powerlevel10k
-    zsh-vi-mode
+    # zsh
+    # zsh-autocomplete
+    # zsh-syntax-highlighting
+    # zsh-powerlevel10k
+    # zsh-vi-mode
     zoxide
     # starship
     fzf
+    unzip
     ripgrep
     fd
     bat
     eza
+    tldr
 
     # Tmux
     tmux
@@ -31,7 +31,11 @@
     # Development
     git
     lazygit
+    gnumake
+    cmake
     gh
+    mise
+    gcc
 
     # Language tooling
     nodejs
@@ -39,6 +43,7 @@
     rustc
     cargo
     go
+    ruby
 
     # Dot files
     chezmoi
@@ -48,14 +53,12 @@
   ];
 
   # Git configuration
-  programs.git = {
+  programs.git.settings = {
     enable = true;
-    userName = "yamlinson";
-    userEmail = "95899054+yamlinson@users.noreply.github.com";
-    extraConfig = {
-      init.defaultBranch = "main";
-      push.autoSetupRemote = true;
-    };
+    user.name = "yamlinson";
+    user.email = "95899054+yamlinson@users.noreply.github.com";
+    init.defaultBranch = "main";
+    push.autoSetupRemote = true;
   };
 
   # Shell configuration
@@ -67,9 +70,38 @@
   #   '';
   # };
 
-  # Or zsh:
-  programs.zsh.enable = true;
-  # programs.zsh.initExtra = ''...'';
+  programs.zsh = {
+    enable = true;
+    dotDir = "/home/main/.config/noop/zsh"; # .zshrc managed by Chezmoi
+    plugins = with pkgs; [
+      {
+        name = "powerlevel10k";
+        src = zsh-powerlevel10k;
+        file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+      }
+      {
+        name = "zsh-autosuggestions";
+        src = zsh-autosuggestions;
+        file = "share/zsh-autosuggestions/zsh-autosuggestions.zsh";
+      }
+      {
+        name = "zsh-syntax-highlighting";
+        src = zsh-syntax-highlighting;
+        file = "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh";
+      }
+      {
+        name = "zsh-vi-mode";
+        src = zsh-vi-mode;
+        file = "share/zsh-vi-mode/zsh-vi-mode.zsh";
+      }
+    ];
+    initExtra = ''
+      # Source Chezmoi-managed configuration
+      if [[ -f ~/.zshrc ]]; then
+        source ~/.zshrc
+      fi
+    '';
+  };
 
   # Neovim configuration
   programs.neovim = {
@@ -85,7 +117,7 @@
       owner = "tmux-plugins";
       repo = "tpm";
       rev = "v3.1.0";
-      sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      sha256 = "sha256-CeI9Wq6tHqV68woE11lIY4cLoNY8XWyXyMHTDmFKJKI=";
     };
     # Make the symlink recursive so TPM can see it's a directory
     recursive = true;

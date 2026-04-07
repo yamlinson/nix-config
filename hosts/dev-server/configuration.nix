@@ -20,9 +20,11 @@
 
   time.timeZone = "America/Denver";
 
+  programs.zsh.enable = true;
   users.users.main = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIrc9OInCEWLBvf5NBAS8qXoXNIFkOODHWBoobKN9Ohx" ];
   };
 
