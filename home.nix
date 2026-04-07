@@ -112,7 +112,7 @@
   };
 
   # Place TPM in the correct location (read-only symlink to /nix/store)
-  home.file.".tmux/plugins/tpm" = {
+  home.file."/home/main/.config/tmux/plugins/tpm" = {
     source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tpm";
