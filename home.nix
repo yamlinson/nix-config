@@ -5,7 +5,6 @@
   home.homeDirectory = "/home/main";
   home.stateVersion = "25.11";
 
-  # Packages for interactive use
   home.packages = with pkgs; [
 
     # Shell tools
@@ -72,7 +71,7 @@
 
   programs.zsh = {
     enable = true;
-    dotDir = "/home/main/.config/noop/zsh"; # .zshrc managed by Chezmoi
+    dotDir = "/home/main/.config/zsh"; # .zshrc managed by Chezmoi
     plugins = with pkgs; [
       {
         name = "powerlevel10k";
@@ -95,7 +94,7 @@
         file = "share/zsh-vi-mode/zsh-vi-mode.zsh";
       }
     ];
-    initExtra = ''
+    initContent = ''
       # Source Chezmoi-managed configuration
       if [[ -f ~/.zshrc ]]; then
         source ~/.zshrc

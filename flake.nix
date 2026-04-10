@@ -13,7 +13,6 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      username = "main";
     in {
       # System configuration
       nixosConfigurations.dev-server = nixpkgs.lib.nixosSystem {
@@ -23,7 +22,8 @@
           home-manager.nixosModules.home-manager {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.${username} = import ./home.nix;
+            home-manager.users.main = import ./home.nix;
+            home-manager.users.code = import ./code.nix;
           }
         ];
       };

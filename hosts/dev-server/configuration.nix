@@ -20,13 +20,41 @@
 
   time.timeZone = "America/Denver";
 
+  # Group for code user
+  users.groups.code = {};
+
+  # Primary user
   programs.zsh.enable = true;
   users.users.main = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "code" ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIrc9OInCEWLBvf5NBAS8qXoXNIFkOODHWBoobKN9Ohx" ];
   };
+
+  # Code user and shared space
+  users.users.code = {
+    isNormalUser = true;
+    home = "/var/lib/code";
+    shell = pkgs.bash;
+    extraGroups = [ ]; 
+    password = "!";
+  };
+
+  # Ensure /var/lib/code exists with correct ownership
+  systemd.tmpfiles.rules = [
+    "d /var/lib/code 2770 code code -"  # 2 = setgid bit
+  ];
+
+  # Ensure new files are group-writable
+  environment.etc."profile.d/shared-git-workspace.sh".text = ''
+    if [[ "$PWD" == /var/lib/code/* ]]; then
+      umask 002  # 664 files, 775 dirs (group writable)
+    fi
+  '';
+
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
