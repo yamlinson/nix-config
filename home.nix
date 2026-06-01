@@ -13,6 +13,7 @@
     # zsh-syntax-highlighting
     # zsh-powerlevel10k
     # zsh-vi-mode
+    neovim
     zoxide
     # starship
     fzf
@@ -33,12 +34,14 @@
     gnumake
     cmake
     gh
+    forgejo-cli
     mise
     gcc
 
     # Language tooling
     nodejs
     python3
+    uv
     rustc
     cargo
     go
@@ -102,13 +105,8 @@
     '';
   };
 
-  # Neovim configuration
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-  };
+  home.sessionVariables.EDITOR = "nvim";
+  home.shellAliases = { vi = "nvim"; vim = "nvim"; };
 
   # Place TPM in the correct location (read-only symlink to /nix/store)
   home.file."/home/main/.config/tmux/plugins/tpm" = {
@@ -127,7 +125,7 @@
   programs.direnv.nix-direnv.enable = true;
 
   # Automatic chezmoi initialization and application
-  home.activation.chezmoiInitAndApply = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.chezmoiInitAndApply = lib.hm.dag.entryBefore ["checkLinkTargets"] ''
     # Ensure we have access to home.packages in PATH
     export PATH="${lib.makeBinPath config.home.packages}:$PATH"
 

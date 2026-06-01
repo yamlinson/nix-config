@@ -20,6 +20,9 @@
 
   time.timeZone = "America/Denver";
 
+  # Enable Docker
+  virtualisation.docker.enable = true;
+
   # Group for code user
   users.groups.code = {};
 
@@ -27,7 +30,7 @@
   programs.zsh.enable = true;
   users.users.main = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "code" ];
+    extraGroups = [ "wheel" "code" "docker" ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIrc9OInCEWLBvf5NBAS8qXoXNIFkOODHWBoobKN9Ohx" ];
   };
@@ -37,24 +40,26 @@
     isNormalUser = true;
     home = "/var/lib/code";
     shell = pkgs.bash;
-    extraGroups = [ ]; 
+    extraGroups = [ "code" "docker" ]; 
     password = "!";
   };
 
-  # Ensure /var/lib/code exists with correct ownership
-  systemd.tmpfiles.rules = [
-    "d /var/lib/code 2770 code code -"  # 2 = setgid bit
-  ];
-
-  # Ensure new files are group-writable
-  environment.etc."profile.d/shared-git-workspace.sh".text = ''
-    if [[ "$PWD" == /var/lib/code/* ]]; then
-      umask 002  # 664 files, 775 dirs (group writable)
-    fi
-  '';
+  system.activationScripts.code-permissions = {
+    deps = [ "users" ];
+    text = ''
+      mkdir -p /var/lib/code/projects/
+      chown code:code /var/lib/code
+      chmod 2770 /var/lib/code
+      ${pkgs.acl}/bin/setfacl -d -m g::rwX /var/lib/code/projects/
+      ${pkgs.acl}/bin/setfacl -d -m o::0 /var/lib/code/projects/
+    '';
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  # Enable FHS-compatible dynamic linking
+  programs.nix-ld.enable = true;
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).

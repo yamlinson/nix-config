@@ -28,6 +28,7 @@
     # Language tooling
     nodejs
     python3
+    uv
     rustc
     cargo
     go
